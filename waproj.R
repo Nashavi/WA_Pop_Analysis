@@ -76,7 +76,7 @@ a%>%
   addTiles() %>% 
   addMarkers(clusterOptions=markerClusterOptions(),popup=a$full_add)
 
-pq<-a[a$yr=="2016-01-01",]
+pq<-a[a$yr=="1990-01-01",]
 pq%>%
   leaflet() %>%
   addTiles() %>% 
