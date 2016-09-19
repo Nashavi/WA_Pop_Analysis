@@ -3,14 +3,14 @@ require(leaflet)
 
 shinyApp(
     ui = fluidPage(
-    # sidebarLayout(
-    #   sidebarPanel(
-    #     sliderInput("year",
-    #                 "Year:",
-    #                 min= 1990, max=2016, step=1 ,value=1990)
-    #     ),)
-      leafletOutput('myMap',width="60%",height="500px")
-      ),
+    sidebarLayout(
+    sidebarPanel(
+    sliderInput("year",
+                     "Year:",
+                     min= 1990, max=2016, step=1 ,value=2016)
+         ),
+      mainPanel(leafletOutput('myMap',width="80%",height="500px"))
+      )),
   server = function(input, output) {
     require(dplyr) #for summarise
     require(reshape) #for melt
@@ -69,11 +69,10 @@ shinyApp(
       leaflet() %>%
       addTiles() %>% 
       addMarkers(clusterOptions=markerClusterOptions(),popup=a$full_add)
+  
+   #pq<- renderPrint({a[a$yr==as.Date(paste(input$year,"01-01",sep=""),format="%Y-%m-%d"),]})
     
-    
-   #pq<- reactive({a[a$yr==as.Date(paste(input$year,"01-01",sep=""),format="%Y-%m-%d"),]})
-    
-    pq<-a[a$yr=="1990-01-01",]
+  pq<-a[a$yr=="1990-01-01",]
     
    output$myMap<- renderLeaflet(
      pq %>%
