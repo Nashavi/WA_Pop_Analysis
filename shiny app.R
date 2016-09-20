@@ -1,24 +1,23 @@
 require(shiny)
 require(leaflet)
-
+require(RColorBrewer)
 shinyApp(
     ui = fluidPage(
-    sidebarLayout(
-    sidebarPanel(
-    sliderInput("year",
-                     "Year:",
-                     min= 1990, max=2016, step=1 ,value=2016)
-         ),
-      mainPanel(leafletOutput('myMap',width="80%",height="500px"))
-      )),
+      leafletOutput('myMap',width="100%",height="500px"),
+      absolutePanel(top=10,right=25,
+                  sliderInput("year", "Year:",min= 1990, max=2016, step=1 ,value=2002
+                  ),
+                  selectInput("colors", "Color Scheme",
+                    rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
+                  #),
+                  #checkboxInput("legend", "Show legend", TRUE)
+                  ))),
   server = function(input, output) {
     require(dplyr) #for summarise
     require(reshape) #for melt
     require(ggmap) #for geocode
     require(stringr) #for string extraction
-    #require(rgdal)
-    #require(sp)
-    
+
     ####Load the data and clean up####
     wdata<-read.csv(url("https://data.wa.gov/api/views/64z8-2nqn/rows.csv"))
     wdata$SEQUENCE<-NULL
@@ -51,17 +50,17 @@ shinyApp(
     #Pull the location for each city address in the dataframe seperately
     # full_addlist<-data.frame(as.character(unique(a$full_add)))
     # names(full_addlist)<-"add"
-    # full_addlist<-data.frame(full_addlist,geocode(as.character(full_addlist$add)))
+    # full_addlist<-data.frame(full_addlist,geocode(as.character(full_addlist$add),source="google"))
     # names(full_addlist)<-c("full_add","lon","lat")
     #save(full_addlist,file="full_addlist.Rdata") #save above file if necessary for future use
-    
+  
     load("full_addlist.Rdata")  #Load the file if already saved
     
-    #Below code checks on the map if the locations have been pulled correctly (i.e. f they lie in the WA state itself)
-    full_addlist%>%
-      leaflet() %>%
-      addTiles() %>% 
-      addMarkers(popup=full_addlist$full_add)
+    #Below code can be used to check on the map if the locations have been pulled correctly (i.e. f they lie in the WA state itself)
+    # full_addlist%>%
+    #   leaflet() %>%
+    #   addTiles() %>% 
+    #   addMarkers(popup=full_addlist$full_add)
     
     a<-left_join(a,full_addlist,by="full_add")
     
@@ -72,15 +71,30 @@ shinyApp(
   
    #pq<- renderPrint({a[a$yr==as.Date(paste(input$year,"01-01",sep=""),format="%Y-%m-%d"),]})
     
-  pq<-a[a$yr=="1990-01-01",]
     
-   output$myMap<- renderLeaflet(
-     pq %>%
-      leaflet() %>%
-      addTiles() %>% 
-      addCircles(weight=1,radius= sqrt(pq$value)*30,popup=paste(pq$full_add,pq$value))
-   )
-  }
-)
-  
+    filteredData <- reactive({
+      a[a$yr == as.Date(paste(as.character(input$year),"-01-01",sep = ""),format="%Y-%m-%d"),]
+    })
+    
+    colorpal <- reactive({
+      colorNumeric(input$colors, a$value)
+    })
+    
+    output$myMap <- renderLeaflet({
+      # Use leaflet() here, and only include aspects of the map that
+      # won't need to change dynamically (at least, not unless the
+      # entire map is being torn down and recreated).
+      leaflet(a) %>% addTiles() %>%
+        fitBounds(~min(a$lon), ~min(a$lat), ~max(a$lon), ~max(a$lat))
+    })
+    
+    observe({
+      pal <- colorpal()
 
+      leafletProxy("myMap",data =filteredData()) %>%
+        clearShapes() %>%
+        addCircles(weight=1,, color = "#777777",
+                         fillColor = ~pal(filteredData()$value), radius = (log(filteredData()$value)*(2^12)),fillOpacity = 0.7, popup = ~paste(filteredData()$full_add)
+        )
+    })
+  })
