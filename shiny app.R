@@ -3,12 +3,12 @@ require(leaflet)
 require(RColorBrewer)
 shinyApp(
     ui = fluidPage(
-      leafletOutput('myMap',width="100%",height="500px"),
+      leafletOutput('myMap',width="100%",height="800px"),
       absolutePanel(top=10,right=25,
                   sliderInput("year", "Year:",min= 1990, max=2016, step=1 ,value=2002
-                  ),
-                  selectInput("colors", "Color Scheme",
-                    rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
+                  #),
+                  #selectInput("colors", "Color Scheme",
+                  #  rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
                   #),
                   #checkboxInput("legend", "Show legend", TRUE)
                   ))),
@@ -23,7 +23,8 @@ shinyApp(
     wdata$SEQUENCE<-NULL
     wdata$FILTER<-NULL
     wdata<-wdata[wdata$COUNTY!="Washington",]
-    wdata<-wdata[str_sub(wdata$JURISDICTION,-6,-1)!="County" | str_sub(wdata$JURISDICTION,1,5)=="Uninc" ,]
+    wdata<-wdata[str_sub(wdata$JURISDICTION,-6,-1)!="County",]
+    #wdata<-wdata[str_sub(wdata$JURISDICTION,-6,-1)!="County" | str_sub(wdata$JURISDICTION,1,5)=="Uninc" ,]
     
     ####Tranform the data frame####
     a<-melt(as.data.frame(wdata))
@@ -76,9 +77,9 @@ shinyApp(
       a[a$yr == as.Date(paste(as.character(input$year),"-01-01",sep = ""),format="%Y-%m-%d"),]
     })
     
-    colorpal <- reactive({
-      colorNumeric(input$colors, a$value)
-    })
+    # colorpal <- reactive({
+    #   colorNumeric(input$colors, a$value)
+    # })
     
     output$myMap <- renderLeaflet({
       # Use leaflet() here, and only include aspects of the map that
@@ -89,12 +90,13 @@ shinyApp(
     })
     
     observe({
-      pal <- colorpal()
+      #pal <- colorpal()
 
       leafletProxy("myMap",data =filteredData()) %>%
-        clearShapes() %>%
-        addCircles(weight=1,, color = "#777777",
-                         fillColor = ~pal(filteredData()$value), radius = (log(filteredData()$value)*(2^12)),fillOpacity = 0.7, popup = ~paste(filteredData()$full_add)
+        clearShapes() %>% clearMarkerClusters() %>%
+        addCircleMarkers(clusterOptions = markerClusterOptions(),clusterId= filteredData()$COUNTY,weight=1,, color = "#777777",
+                         #fillColor = ~pal(filteredData()$value), 
+                         radius = ((sqrt(filteredData()$value)^.5)*4),fillOpacity = 0.7, popup = ~paste(filteredData()$full_add,filteredData()$value)
         )
     })
   })
