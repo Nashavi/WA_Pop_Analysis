@@ -9,9 +9,9 @@ shinyApp(
                   #),
                   #selectInput("colors", "Color Scheme",
                   #  rownames(subset(brewer.pal.info, category %in% c("seq", "div")))
-                  #),
-                  #checkboxInput("legend", "Show legend", TRUE)
-                  ))),
+                  ),
+                  checkboxInput("Majorcities", "Show Seattle & Spokane", TRUE)
+                  )),
   server = function(input, output) {
     require(dplyr) #for summarise
     require(reshape) #for melt
@@ -72,9 +72,16 @@ shinyApp(
   
    #pq<- renderPrint({a[a$yr==as.Date(paste(input$year,"01-01",sep=""),format="%Y-%m-%d"),]})
     
+    b<-a[a$JURISDICTION %in% c("Seattle","Spokane"),]
+    
+    a<-a[!a$JURISDICTION %in% c("Seattle","Spokane"),]
     
     filteredData <- reactive({
       a[a$yr == as.Date(paste(as.character(input$year),"-01-01",sep = ""),format="%Y-%m-%d"),]
+    })
+    
+    filteredData2 <- reactive({
+      b[b$yr == as.Date(paste(as.character(input$year),"-01-01",sep = ""),format="%Y-%m-%d"),]
     })
     
     # colorpal <- reactive({
@@ -93,10 +100,26 @@ shinyApp(
       #pal <- colorpal()
 
       leafletProxy("myMap",data =filteredData()) %>%
-        clearShapes() %>% clearMarkerClusters() %>%
-        addCircleMarkers(clusterOptions = markerClusterOptions(),clusterId= filteredData()$COUNTY,weight=1,, color = "#777777",
+        clearShapes() %>% clearMarkerClusters() %>% clearMarkers() %>%
+        addCircleMarkers(
+          #clusterOptions = markerClusterOptions(),clusterId= filteredData()$COUNTY,
+          weight=1,, color = "#777777",
                          #fillColor = ~pal(filteredData()$value), 
-                         radius = ((sqrt(filteredData()$value)^.5)*4),fillOpacity = 0.7, popup = ~paste(filteredData()$full_add,filteredData()$value)
+                         radius = (((filteredData()$value))/(10^4)),fillOpacity = 0.7, popup = ~paste(filteredData()$full_add,filteredData()$value)
         )
+    })
+    
+    observe({
+      proxy <- leafletProxy("myMap", data = filteredData2())
+      proxy %>% clearControls()
+      if (input$Majorcities) {
+        #pal <- colorpal()
+        proxy %>% addCircleMarkers(
+          #clusterOptions = markerClusterOptions(),clusterId= filteredData()$COUNTY,
+          weight=1,, color = "#777777",
+          #fillColor = ~pal(filteredData()$value), 
+          radius = (((filteredData2()$value))/(10^4)),fillOpacity = 0.7, popup = ~paste(filteredData2()$full_add,filteredData2()$value)
+        )
+      }
     })
   })
