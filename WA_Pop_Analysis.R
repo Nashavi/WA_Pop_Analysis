@@ -4,8 +4,9 @@ require(plyr) #for ddply
 require(reshape) #for melt
 require(ggmap) #for geocode
 require(stringr) #for string extraction
-require(ggplot2)
-
+require(ggplot2) #for plots
+require(leaflet) #for mapping
+require(RColorBrewer) #for Coloring the circle markers on map
 
 ####Load the data and clean up####
 
