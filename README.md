@@ -11,7 +11,7 @@ dplyr for summarise
 plyr for ddply;
 reshape for melt;
 ggmap for geocode;
-stringr or string extraction;
+stringr for string extraction;
 ggplot2 for plots;
 leaflet for mapping;
 RColorBrewer for Coloring the circle markers on map
