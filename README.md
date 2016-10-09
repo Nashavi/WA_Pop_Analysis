@@ -8,10 +8,10 @@ This dataset did not have location coordinates of the cities. They were derived 
 
 Libraries required are:
 dplyr for summarise
-plyr for ddply
-reshape for melt
-ggmap for geocode
-stringr or string extraction
-ggplot2 for plots
-leaflet for mapping
+plyr for ddply;
+reshape for melt;
+ggmap for geocode;
+stringr or string extraction;
+ggplot2 for plots;
+leaflet for mapping;
 RColorBrewer for Coloring the circle markers on map
