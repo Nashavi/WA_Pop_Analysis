@@ -1,6 +1,6 @@
 # WA_Pop_Analysis
 
-Analysis of population of Washington through the period 1990-2010. The analysis is at a city level and observations are noted at County level.
+Analysis of population growth in Washington state through the period 1990-2010. The analysis is at a city level and observations are noted at County level.
 
 For this analysis, I have used the 1990-2016 county wise population dataset available in the open data portal for Washington state here: http://data.wa.gov/Demographics/WAOFM-April-1-Population-by-State-County-and-City-/tecv-qzfm. 
 
