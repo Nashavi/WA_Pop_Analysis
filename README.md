@@ -6,6 +6,8 @@ For this analysis, I have used the 1990-2016 county wise population dataset avai
 
 R shiny app is available here: http://nashavi.shinyapps.io/WA_State-Population_Growth/
 
+A write up is available on my Linkedin Profile: https://www.linkedin.com/in/avinash-kamath-3518a815
+
 This dataset did not have location coordinates of the cities. They were derived using Google APIs. I crunched this dataset using R to plot the year-wise and city-wise growth in population and built an interactive visualization for it using Shiny app framework.
 
 Libraries required are:
