@@ -4,6 +4,8 @@ Analysis of population growth in Washington state through the period 1990-2010. 
 
 For this analysis, I have used the 1990-2016 county wise population dataset available in the open data portal for Washington state here: http://data.wa.gov/Demographics/WAOFM-April-1-Population-by-State-County-and-City-/tecv-qzfm. 
 
+R shiny app is available here: http://nashavi.shinyapps.io/WA_State-Population_Growth/
+
 This dataset did not have location coordinates of the cities. They were derived using Google APIs. I crunched this dataset using R to plot the year-wise and city-wise growth in population and built an interactive visualization for it using Shiny app framework.
 
 Libraries required are:
